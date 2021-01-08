@@ -7,10 +7,10 @@ import com.allanlf.dsdeliver.service.OrderService;
 import com.allanlf.dsdeliver.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,5 +24,15 @@ public class OrderController {
     public ResponseEntity<List<OrderDTO>> findAll() {
         List<OrderDTO> list = service.findOrdersWithProducts();
         return ResponseEntity.ok().body(list);
+    }
+
+    @PostMapping
+    // RequestBody para sinalizar que o conteudo virá no corpo da requisição
+    public ResponseEntity<OrderDTO> insert(@RequestBody OrderDTO dto) {
+        dto = service.insert(dto);
+        // URI para retornar o id do objeto criado e retornar code 201
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(dto.getId()).toUri();
+        return ResponseEntity.created(uri).body(dto);
     }
 }
